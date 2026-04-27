@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+
+@theme {
+  --color-brand-primary: #8b5cf6; /* Фіолетовий */
+  --color-brand-secondary: #ec4899; /* Рожевий */
+  --color-brand-dark: #0f172a; /* Темно-синій фон */
+  --color-brand-surface: #1e293b; /* Фон для карток */
+
+  /* Кастомні брейкпоінти (якщо стандартних не вистачає) */
+  --breakpoint-mobile-lg: 480px;
+  --breakpoint-tablet-md: 820px;
+}
+
+/* * Базові глобальні стилі (типографія, загальний лейаут)
+ */
+@layer base {
+  body {
+    background-color: var(--color-brand-dark);
+    color: #f8fafc;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+}

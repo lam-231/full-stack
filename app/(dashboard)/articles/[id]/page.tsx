@@ -1,53 +1,45 @@
-import { notFound } from 'next/navigation';
+'use client';
 
-export async function generateStaticParams() {
-    const ids = Array.from({ length: 10 }, (_, i) => String(i + 1));
-    return ids.map((id) => ({ id }));
-}
+import useSWR from 'swr';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
 
-export default async function SingleArticlePage({
-                                                    params,
-                                                }: {
-    params: Promise<{ id: string }>;
-}) {
-    const { id } = await params;
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-    const postPromise = fetch(`https://jsonplaceholder.typicode.com/posts/${id}`);
-    const commentsPromise = fetch(`https://jsonplaceholder.typicode.com/posts/${id}/comments`);
+export default function ArticleDetailPage() {
+    const params = useParams();
+    const id = params.id;
 
-    const [postRes, commentsRes] = await Promise.all([postPromise, commentsPromise]);
+    const { data: discovery, error, isLoading } = useSWR(
+        id ? `/api/discoveries/${id}` : null,
+        fetcher
+    );
 
-    if (!postRes.ok) {
-        notFound();
-    }
-
-    const post = await postRes.json();
-    const comments = await commentsRes.json();
+    if (isLoading) return <div className="text-center text-white mt-10 text-xl">Розшифровка сигналу...</div>;
+    if (error) return <div className="text-center text-red-500 mt-10">Помилка зв'язку з базою.</div>;
+    if (!discovery || discovery.error) return <div className="text-center text-white mt-10 text-xl">Запис не знайдено</div>;
 
     return (
-        <div className="max-w-2xl">
-            <article className="mb-10">
-        <span className="inline-block px-3 py-1 mb-3 text-xs font-semibold text-green-400 bg-green-900/30 rounded-full">
-          Стаття #{post.id}
-        </span>
-                <h1 className="text-3xl font-bold text-white mb-4 capitalize">{post.title}</h1>
-                <p className="text-lg text-gray-300 leading-relaxed">{post.body}</p>
-            </article>
+        <div className="max-w-3xl mx-auto p-6 md:p-8 bg-gray-800 rounded-2xl shadow-xl mt-4 md:mt-8 border border-gray-700">
+            <Link href="/articles" className="text-blue-400 hover:text-blue-300 text-sm font-semibold mb-6 inline-block">
+                &larr; Повернутися до журналу
+            </Link>
 
-            <section>
-                <h2 className="text-2xl font-semibold text-white mb-4 border-b border-gray-700 pb-2">
-                    Коментарі ({comments.length})
-                </h2>
-                <div className="flex flex-col gap-4">
-                    {comments.map((comment: any) => (
-                        <div key={comment.id} className="p-4 bg-gray-800 rounded-lg border border-gray-700">
-                            <h3 className="font-bold text-blue-400 mb-1">{comment.email}</h3>
-                            <h4 className="text-sm font-semibold text-gray-200 mb-2 capitalize">{comment.name}</h4>
-                            <p className="text-gray-400 text-sm">{comment.body}</p>
-                        </div>
-                    ))}
-                </div>
-            </section>
+            <div className="mb-8 border-b border-gray-700 pb-6">
+        <span className="text-xs font-bold bg-blue-900/50 text-blue-300 px-3 py-1 rounded-full uppercase tracking-wider mb-4 inline-block">
+          {discovery.category}
+        </span>
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
+                    {discovery.title}
+                </h1>
+                <p className="text-gray-400 text-sm">
+                    Дата запису: {new Date(discovery.date).toLocaleDateString('uk-UA')}
+                </p>
+            </div>
+
+            <div className="text-gray-300 text-lg leading-relaxed whitespace-pre-wrap">
+                {discovery.description}
+            </div>
         </div>
     );
 }

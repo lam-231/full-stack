@@ -1,63 +1,98 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { TextField, Button, Box, Typography } from '@mui/material';
 
 export default function CreateArticlePage() {
-    return (
-        <div className="max-w-3xl mx-auto p-5 md:p-8 bg-brand-surface rounded-2xl shadow-xl mt-4 md:mt-8 border border-gray-700">
+    const router = useRouter();
 
+    const [formData, setFormData] = useState({
+        title: '',
+        category: '',
+        description: ''
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        try {
+            const res = await fetch('/api/discoveries', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+
+            if (res.ok) {
+                router.push('/articles');
+            }
+        } catch (error) {
+            console.error('Помилка створення:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <div className="max-w-3xl mx-auto p-6 md:p-8 bg-gray-800 rounded-2xl shadow-xl mt-4 md:mt-8 border border-gray-700">
             <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'white', fontWeight: 'bold' }}>
-                Створити нову статтю
+                Нове відкриття
             </Typography>
 
             <p className="text-gray-400 mb-6 text-sm md:text-base">
-                Заповніть форму нижче, щоб додати нову публікацію. Дизайн цієї форми адаптивний і побудований на компонентах Material-UI.
+                Додайте новий запис до бортового журналу SEHub. Дані будуть збережені у базу даних.
             </p>
 
-            <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
 
                 <TextField
-                    label="Заголовок статті"
+                    label="Заголовок"
                     variant="outlined"
+                    required
                     fullWidth
-                    sx={{
-                        input: { color: 'white' },
-                        label: { color: '#9ca3af' },
-                        '& .MuiOutlinedInput-root': {
-                            '& fieldset': { borderColor: '#4b5563' },
-                            '&:hover fieldset': { borderColor: 'var(--color-brand-primary)' },
-                        }
-                    }}
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    sx={{ input: { color: 'white' }, label: { color: '#9ca3af' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#4b5563' }, '&:hover fieldset': { borderColor: '#3b82f6' } } }}
                 />
 
                 <TextField
-                    label="Текст статті"
+                    label="Категорія (наприклад: Планети, Місії, Зорі)"
                     variant="outlined"
+                    required
+                    fullWidth
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    sx={{ input: { color: 'white' }, label: { color: '#9ca3af' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#4b5563' }, '&:hover fieldset': { borderColor: '#3b82f6' } } }}
+                />
+
+                <TextField
+                    label="Опис відкриття"
+                    variant="outlined"
+                    required
                     multiline
                     rows={6}
                     fullWidth
-                    sx={{
-                        textarea: { color: 'white' },
-                        label: { color: '#9ca3af' },
-                        '& .MuiOutlinedInput-root': {
-                            '& fieldset': { borderColor: '#4b5563' },
-                            '&:hover fieldset': { borderColor: 'var(--color-brand-primary)' },
-                        }
-                    }}
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    sx={{ textarea: { color: 'white' }, label: { color: '#9ca3af' }, '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: '#4b5563' }, '&:hover fieldset': { borderColor: '#3b82f6' } } }}
                 />
 
                 <Button
+                    type="submit"
                     variant="contained"
                     size="large"
+                    disabled={isSubmitting}
                     sx={{
-                        backgroundColor: 'var(--color-brand-primary)',
+                        backgroundColor: '#2563eb',
                         padding: '12px 24px',
                         fontSize: '1.1rem',
-                        '&:hover': { backgroundColor: 'var(--color-brand-secondary)' },
+                        '&:hover': { backgroundColor: '#1d4ed8' },
                         alignSelf: { xs: 'stretch', md: 'flex-start' }
                     }}
                 >
-                    Опублікувати
+                    {isSubmitting ? 'Збереження...' : 'Опублікувати запис'}
                 </Button>
             </Box>
         </div>

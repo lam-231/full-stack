@@ -1,0 +1,12 @@
+### Отримати всі відкриття (GET)
+GET http://localhost:3000/api/discoveries
+
+### Створити нове відкриття (POST)
+POST http://localhost:3000/api/discoveries
+Content-Type: application/json
+
+{
+  "title": "Знайдено нову екзопланету",
+  "description": "Астрономи виявили планету, схожу на Землю.",
+  "category": "Планети"
+}

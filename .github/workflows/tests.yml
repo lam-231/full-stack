@@ -1,0 +1,39 @@
+name: CI Tests (Jest & Playwright)
+
+
+on:
+  push:
+    branches: [ main, "lab-*" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Отримання коду репозиторію
+        uses: actions/checkout@v4
+
+      - name: Налаштування Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Встановлення залежностей
+        run: npm install
+
+      - name: Генерація клієнта Prisma
+        run: npx prisma generate
+
+      - name: Запуск Unit-тестів (Jest)
+        run: npm run test
+
+      - name: Встановлення браузерів для Playwright
+        run: npx playwright install --with-deps
+
+      - name: Запуск E2E-тестів (Playwright)
+        run: npx playwright test
+        env:
+          NEXTAUTH_SECRET: "super-secret-ci-key"
+          NEXTAUTH_URL: "http://localhost:3000"

@@ -12,7 +12,7 @@ export default function ArticlesPage() {
 
     if (isLoading) return <div className="text-center text-white mt-10 text-xl">Отримання даних з орбіти... 🛰️</div>;
     if (error) return <div className="text-center text-red-500 mt-10">Помилка зв'язку з базою SEHub.</div>;
-
+    if (!Array.isArray(discoveries))  return <div className="text-center text-red-500 mt-10">Отримані невалідні данні</div>;
     return (
         <div className="p-6 max-w-6xl mx-auto">
             <div className="flex justify-between items-center mb-8">

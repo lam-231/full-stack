@@ -22,6 +22,11 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  bio           String?   @db.Text
+  location      String?
+  position      String?
+  age           Int?
+  gender        String?
   accounts      Account[]
   sessions      Session[]
 }

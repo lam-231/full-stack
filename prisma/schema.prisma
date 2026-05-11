@@ -7,12 +7,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model Discovery {
   id          Int      @id @default(autoincrement())
   title       String
   description String
   category    String
   date        DateTime @default(now())
+  authorId    String?
+  author      User?    @relation("UserDiscoveries", fields: [authorId], references: [id])
+  comments    Comment[]
+  favoritedBy User[]   @relation("UserFavorites")
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  text        String   @db.Text
+  createdAt   DateTime @default(now())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  discoveryId Int
+  discovery   Discovery @relation(fields: [discoveryId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -27,8 +48,13 @@ model User {
   position      String?
   age           Int?
   gender        String?
+  role          Role      @default(USER)
+
   accounts      Account[]
   sessions      Session[]
+  discoveries   Discovery[] @relation("UserDiscoveries")
+  favorites     Discovery[] @relation("UserFavorites")
+  comments      Comment[]
 }
 
 model Account {

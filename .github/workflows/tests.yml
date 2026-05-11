@@ -11,6 +11,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/sehub?schema=public"
+      NEXTAUTH_SECRET: "super-secret-ci-key"
+      NEXTAUTH_URL: "http://localhost:3000"
+
     steps:
       - name: Отримання коду репозиторію
         uses: actions/checkout@v4
@@ -34,6 +39,3 @@ jobs:
 
       - name: Запуск E2E-тестів (Playwright)
         run: npx playwright test
-        env:
-          NEXTAUTH_SECRET: "super-secret-ci-key"
-          NEXTAUTH_URL: "http://localhost:3000"

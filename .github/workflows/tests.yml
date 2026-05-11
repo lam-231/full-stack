@@ -11,8 +11,23 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: sehub_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
-      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/sehub?schema=public"
+      DATABASE_URL: "postgresql://postgres:password@localhost:5432/sehub_test?schema=public"
       NEXTAUTH_SECRET: "super-secret-ci-key"
       NEXTAUTH_URL: "http://localhost:3000"
 
@@ -30,6 +45,9 @@ jobs:
 
       - name: Генерація клієнта Prisma
         run: npx prisma generate
+
+      - name: Синхронізація структури БД
+        run: npx prisma db push
 
       - name: Запуск Unit-тестів (Jest)
         run: npm run test

@@ -7,18 +7,19 @@ test.describe('SEHub E2E Tests', () => {
 
     const heading = page.locator('h1');
     await expect(heading).toBeVisible();
-    await expect(heading).toContainText('Вітаємо');
+
+    await expect(page.locator('text=Ваш особистий бортовий журнал для дослідження Всесвіту')).toBeVisible();
   });
 
-  test('should navigate to articles page when clicking the button', async ({ page }) => {
+  test('should navigate to login page from homepage as guest', async ({ page }) => {
     await page.goto('http://localhost:3000/');
 
-    await page.click('text=Перейти до відкриттів');
+    await page.click('text=Увійти в систему');
 
-    await expect(page).toHaveURL(/.*\/articles/);
+    await expect(page).toHaveURL(/.*\/api\/auth\/signin/);
   });
 
-  test('should navigate to login page from dashboard', async ({ page }) => {
+  test('should navigate to login page from dashboard navigation', async ({ page }) => {
     await page.goto('http://localhost:3000/articles');
 
     await page.click('text=Увійти');

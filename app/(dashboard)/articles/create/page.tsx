@@ -1,11 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { useRouter } from 'next/navigation';
 import { TextField, Button, Box, Typography } from '@mui/material';
+import { useSession } from 'next-auth/react';
+
+
 
 export default function CreateArticlePage() {
     const router = useRouter();
+
+    const { status } = useSession();
 
     const [formData, setFormData] = useState({
         title: '',
@@ -13,6 +18,12 @@ export default function CreateArticlePage() {
         description: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (status === 'unauthenticated') {
+            router.push('/api/auth/signin');
+        }
+    }, [status, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -34,6 +45,10 @@ export default function CreateArticlePage() {
             setIsSubmitting(false);
         }
     };
+
+    if (status === 'loading') {
+        return <div className="text-center text-white mt-10 text-xl">Перевірка доступу...</div>;
+    }
 
     return (
         <div className="max-w-3xl mx-auto p-6 md:p-8 bg-gray-800 rounded-2xl shadow-xl mt-4 md:mt-8 border border-gray-700">

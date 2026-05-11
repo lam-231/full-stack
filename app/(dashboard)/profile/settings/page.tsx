@@ -3,31 +3,29 @@
 import { useState, useEffect } from 'react';
 import { TextField, Button, Box, Typography, Alert, MenuItem } from '@mui/material';
 import Link from 'next/link';
+import useSWR from 'swr';
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function SettingsPage() {
     const [formData, setFormData] = useState({
         name: '', bio: '', location: '', position: '', age: '', gender: ''
     });
     const [status, setStatus] = useState<{ type: 'error' | 'success', message: string } | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const { data, error, isLoading } = useSWR('/api/profile', fetcher);
 
     useEffect(() => {
-        fetch('/api/profile')
-            .then((res) => res.json())
-            .then((data) => {
-                if (data && !data.error) {
-                    setFormData({
-                        name: data.name || '',
-                        bio: data.bio || '',
-                        location: data.location || '',
-                        position: data.position || '',
-                        age: data.age?.toString() || '',
-                        gender: data.gender || ''
-                    });
-                }
-                setIsLoading(false);
+        if (data && !data.error) {
+            setFormData({
+                name: data.name || '',
+                bio: data.bio || '',
+                location: data.location || '',
+                position: data.position || '',
+                age: data.age?.toString() || '',
+                gender: data.gender || ''
             });
-    }, []);
+        }
+    }, [data]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });

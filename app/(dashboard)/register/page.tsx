@@ -13,7 +13,7 @@ export default function RegisterPage() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,6 +43,7 @@ export default function RegisterPage() {
             setIsSubmitting(false);
         }
     };
+
 
     return (
         <div className="max-w-md mx-auto p-6 md:p-8 bg-gray-800 rounded-2xl shadow-xl mt-12 border border-gray-700">
